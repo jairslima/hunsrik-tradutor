@@ -38,9 +38,10 @@ INSTRUÇÕES:
 6. Preserve a estrutura de parágrafos e numeração do original
 7. Responda APENAS com a tradução, sem explicações adicionais`;
 
-export function buildUserPrompt(text: string, dictContext: string): string {
+export function buildUserPrompt(text: string, dictContext: string, ntContext?: string): string {
   return `VERBETES RELEVANTES DO DICIONÁRIO OFICIAL:
 ${dictContext || "(nenhum verbete específico encontrado — use as regras gerais)"}
+${ntContext ? `\nVERSÍCULOS DO NOVO TESTAMENTO EM HUNSRIK (use como referência de estilo e vocabulário):\n${ntContext}` : ""}
 
 TEXTO PARA TRADUZIR:
 ${text}`;

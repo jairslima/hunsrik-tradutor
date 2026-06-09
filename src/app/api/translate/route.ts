@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { lookupRelevant } from "@/lib/dictionary";
+import { lookupRelevant, lookupHunsrikWords } from "@/lib/dictionary";
+import { findRelevantVerses } from "@/lib/corpus";
 import { SYSTEM_PROMPT, buildUserPrompt } from "@/lib/hunsrik-prompt";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
@@ -23,9 +24,14 @@ export async function POST(req: NextRequest) {
     const dictContext =
       direction === "pt-hrx" ? lookupRelevant(text) : "";
 
+    const ntContext =
+      direction === "pt-hrx"
+        ? findRelevantVerses(lookupHunsrikWords(text), 8)
+        : "";
+
     const userPrompt =
       direction === "pt-hrx"
-        ? buildUserPrompt(text, dictContext)
+        ? buildUserPrompt(text, dictContext, ntContext)
         : `Traduza o seguinte texto em Hunsrik Plat Taytx para português brasileiro:\n\n${text}`;
 
     const model = genAI.getGenerativeModel({
@@ -40,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     const translation = result.response.text();
 
-    return NextResponse.json({ translation, dictContext });
+    return NextResponse.json({ translation, dictContext, ntContext });
   } catch (err) {
     console.error(err);
     return NextResponse.json(

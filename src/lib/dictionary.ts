@@ -3,7 +3,7 @@ import dicData from "../../public/dicionario_hunsrik.json";
 type DicEntry = { portugues: string; hunsrik: string; letra: string };
 const dic = dicData as Record<string, DicEntry>;
 
-export function lookupRelevant(text: string, maxEntries = 60): string {
+function findEntries(text: string, maxEntries = 60): DicEntry[] {
   const words = text
     .toLowerCase()
     .replace(/[.,;:!?()]/g, " ")
@@ -17,13 +17,11 @@ export function lookupRelevant(text: string, maxEntries = 60): string {
     if (seen.has(word)) continue;
     seen.add(word);
 
-    // Busca exata
     if (dic[word]) {
       found.push(dic[word]);
       continue;
     }
 
-    // Busca por prefixo (4+ chars)
     if (word.length >= 4) {
       const prefix = word.slice(0, 5);
       for (const key of Object.keys(dic)) {
@@ -36,10 +34,17 @@ export function lookupRelevant(text: string, maxEntries = 60): string {
     }
   }
 
-  return found
-    .slice(0, maxEntries)
+  return found.slice(0, maxEntries);
+}
+
+export function lookupRelevant(text: string, maxEntries = 60): string {
+  return findEntries(text, maxEntries)
     .map((e) => `${e.portugues} = ${e.hunsrik}`)
     .join("\n");
+}
+
+export function lookupHunsrikWords(text: string, maxEntries = 60): string[] {
+  return findEntries(text, maxEntries).map((e) => e.hunsrik);
 }
 
 export function searchDictionary(query: string, limit = 20): DicEntry[] {
