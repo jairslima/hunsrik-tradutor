@@ -41,11 +41,10 @@ export async function POST(req: NextRequest) {
     const translation = result.response.text();
 
     return NextResponse.json({ translation, dictContext });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error("TRANSLATE_ERROR:", msg);
+  } catch (err) {
+    console.error(err);
     return NextResponse.json(
-      { error: `Erro: ${msg}` },
+      { error: "Erro ao traduzir. Tente novamente." },
       { status: 500 }
     );
   }
