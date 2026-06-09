@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function Header({ activeTab, onTabChange }: {
   activeTab: string;
@@ -15,13 +16,22 @@ export default function Header({ activeTab, onTabChange }: {
     <header className="bg-hunsrik-dark text-white shadow-lg">
       <div className="max-w-5xl mx-auto px-4 py-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h1 className="text-xl font-bold text-hunsrik-gold">
-              Hunsrik Plat Taytx
-            </h1>
-            <p className="text-xs text-gray-300 mt-0.5">
-              Tradutor Oficial · Projeto Hunsrik Plat Taytx · Santa Maria do Herval/RS
-            </p>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/logo-hunsrik.webp"
+              alt="Logo Hunsrik Plat Taytx"
+              width={44}
+              height={44}
+              className="rounded-full"
+            />
+            <div>
+              <h1 className="text-xl font-bold text-hunsrik-gold">
+                Hunsrik Plat Taytx
+              </h1>
+              <p className="text-xs text-gray-300 mt-0.5">
+                Tradutor Oficial · Projeto Hunsrik Plat Taytx · Santa Maria do Herval/RS
+              </p>
+            </div>
           </div>
           <nav className="flex gap-1">
             {tabs.map((t) => (
