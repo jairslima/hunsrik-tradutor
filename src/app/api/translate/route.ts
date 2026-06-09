@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { lookupRelevant } from "@/lib/dictionary";
 import { SYSTEM_PROMPT, buildUserPrompt } from "@/lib/hunsrik-prompt";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,15 +28,17 @@ export async function POST(req: NextRequest) {
         ? buildUserPrompt(text, dictContext)
         : `Traduza o seguinte texto em Hunsrik Plat Taytx para português brasileiro:\n\n${text}`;
 
-    const message = await client.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 2048,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: userPrompt }],
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      systemInstruction: SYSTEM_PROMPT,
     });
 
-    const translation =
-      message.content[0].type === "text" ? message.content[0].text : "";
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+      generationConfig: { maxOutputTokens: 2048, temperature: 0.3 },
+    });
+
+    const translation = result.response.text();
 
     return NextResponse.json({ translation, dictContext });
   } catch (err) {
