@@ -41,10 +41,11 @@ export async function POST(req: NextRequest) {
     const translation = result.response.text();
 
     return NextResponse.json({ translation, dictContext });
-  } catch (err) {
-    console.error(err);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("TRANSLATE_ERROR:", msg);
     return NextResponse.json(
-      { error: "Erro ao traduzir. Verifique a chave de API." },
+      { error: `Erro: ${msg}` },
       { status: 500 }
     );
   }
