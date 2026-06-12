@@ -75,14 +75,34 @@ git push origin master  # Push + deploy automático via GitHub
 - Tradução funcional PT↔HRX com dicionário de 6.833 entradas
 - Deploy automático via push no GitHub (branch master)
 
+## Pipeline de Tradução Bíblica (AT)
+
+Scripts em `tools/` para extrair e traduzir livros do AT:
+
+| Script | Função | Input | Output |
+|--------|--------|-------|--------|
+| `1_extrai_proverbios.py` | Extrai versículos do PDF NTLH | PDF 3002 págs | `proverbios_ntlh.json` |
+| `2_traduz_proverbios.py` | Traduz para Hunsrik via Gemini 2.5 Flash | `proverbios_ntlh.json` | `proverbios_hunsrik.json` |
+| `3_gera_docx.py` | Gera DOCX bilíngue HRX/NTLH | `proverbios_hunsrik.json` | `PROVERBIOS_Hunsrik.docx` |
+
+**Status Provérbios:** 31/31 capítulos, 911 versículos — entregue à Dra. Solange em 12/06/2026.
+
+**Lições do pipeline:**
+- `max_output_tokens=32768` obrigatório (com 8192 o JSON é truncado em caps grandes)
+- `thinking_budget=0` elimina tokens de raciocínio que consomem budget invisível
+- Detectar `"PerDay"` no erro 429 e parar imediatamente (não tentar capítulos seguintes)
+- Free tier: 20 req/dia — 31 capítulos de Provérbios levaram 4 ciclos noturnos
+- Para Salmos (150 caps): considerar API paga (~US$1-2 para completar em uma noite)
+
 ## Próximos Passos
-1. **Qualidade de tradução:** quando NT digital chegar, expandir corpus para 7.000+ pares paralelos e melhorar o SYSTEM_PROMPT
-2. **Revisão da Dra. Solange:** enviar gramática descritiva para validação
-3. **SBB:** contato formal sobre o projeto do Antigo Testamento
-4. **Google Translate:** preparar pacote de dados com 30+ pares paralelos para submissão
-5. **Domínio personalizado:** configurar domínio próprio (ex: tradutor.hunsrik.com.br)
-6. **Publicação acadêmica:** artigo sobre a digitalização do acervo e o sistema de tradução
-7. **IPHAN/MinC:** candidatura a edital de preservação lingüística
+1. **Integrar Provérbios no site:** adicionar `proverbios_hunsrik.json` ao corpus RAG do site
+2. **Salmos:** próximo livro a traduzir (150 caps, 2.461 versículos) — clonar pipeline e adaptar scripts
+3. **API paga:** avaliar upgrade Gemini para evitar 20 req/dia (Salmos levaria ~30 dias no free tier)
+4. **Qualidade de tradução:** expandir corpus com os Provérbios traduzidos para enriquecer o SYSTEM_PROMPT
+5. **SBB:** contato formal sobre o projeto do AT completo
+6. **Google Translate:** preparar pacote de dados com 30+ pares paralelos para submissão
+7. **Domínio personalizado:** configurar domínio próprio (ex: tradutor.hunsrik.com.br)
+8. **IPHAN/MinC:** candidatura a edital de preservação lingüística
 
 ## Problemas Conhecidos
 - Qualidade de tradução limitada pelo tamanho do dicionário e ausência do corpus paralelo completo do NT
